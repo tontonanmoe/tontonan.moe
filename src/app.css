@@ -1,0 +1,58 @@
+@import 'tailwindcss';
+@plugin '@tailwindcss/forms';
+@plugin '@tailwindcss/typography';
+
+@layer utilities {
+	@keyframes infinite-slide {
+		from {
+			transform: translate3d(0, 0, 0);
+		}
+		to {
+			transform: translate3d(-50%, 0, 0);
+		}
+	}
+
+	.interactive-carousel {
+		animation: infinite-slide 40s linear infinite;
+		will-change: transform;
+		animation-play-state: paused;
+	}
+
+	.group:hover .interactive-carousel {
+		animation-play-state: running;
+	}
+}
+
+body {
+	@apply bg-slate-900;
+}
+
+body::before {
+	content: '';
+	position: fixed;
+	top: 0;
+	left: 0;
+	width: 100vw;
+	height: 100vh;
+	z-index: -1;
+	pointer-events: none;
+
+	background:
+		radial-gradient(circle at 15% 25%, rgba(67, 56, 202, 0.2) 0%, transparent 25%),
+		radial-gradient(circle at 85% 75%, rgba(124, 58, 237, 0.15) 0%, transparent 30%),
+		radial-gradient(circle at 50% 50%, rgba(29, 78, 216, 0.1) 0%, transparent 20%);
+	background-blend-mode: overlay;
+
+	filter: blur(80px);
+	animation: subtle-rotate 30s linear infinite;
+}
+
+/* Definisikan animasi rotasi */
+@keyframes subtle-rotate {
+	from {
+		transform: rotate(0deg);
+	}
+	to {
+		transform: rotate(360deg);
+	}
+}
