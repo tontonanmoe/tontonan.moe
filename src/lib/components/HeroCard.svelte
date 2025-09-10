@@ -1,10 +1,6 @@
 <script lang="ts">
 	import { ArrowUpRight } from 'lucide-svelte';
-	import type { ComponentType } from 'svelte';
-	import { fade } from 'svelte/transition';
-	import YouTubePlayer from './YouTubePlayer.svelte'; // Impor komponen yang dapat digunakan kembali
 
-	// PROPS
 	export let href: string;
 	export let title: string;
 	export let subtitle: string | undefined = undefined;
@@ -12,36 +8,14 @@
 	export let className: string = '';
 	export let carouselImages: any[] | undefined = undefined;
 	export let backgroundText: string | undefined = undefined;
-	export let trailerId: string | null | undefined = undefined;
-
-	// STATE
-	let isHovering = false;
-	let videoHasError = false;
-	let isPlayerVisible = false; // State untuk mengontrol visibilitas setelah video siap
-
-	// EVENT HANDLERS
-	function handleVideoError() {
-		videoHasError = true;
-	}
-	function handlePlayerReady() {
-		isPlayerVisible = true;
-	}
 </script>
 
 <a
 	{href}
 	class="group relative flex flex-col justify-end overflow-hidden rounded-xl bg-slate-800 p-6 text-white shadow-lg transition-transform duration-300 ease-in-out hover:scale-[1.02] hover:shadow-2xl {className}"
-	on:mouseenter={() => (isHovering = true)}
-	on:mouseleave={() => {
-		isHovering = false;
-		videoHasError = false;
-		isPlayerVisible = false; // Reset semua state
-	}}
 >
-	<!-- "Kanvas" Latar Belakang Utama -->
 	<div class="absolute inset-0 z-0 overflow-hidden">
-		<!-- Wadah Latar Belakang Non-Video -->
-		<div class="absolute inset-0 transition-opacity duration-300" class:opacity-0={isPlayerVisible}>
+		<div class="absolute inset-0 transition-opacity duration-300">
 			<!-- 1. Latar Belakang Carousel Gambar -->
 			{#if carouselImages && carouselImages.length > 0}
 				<div
@@ -95,36 +69,8 @@
 				</div>
 			{/if}
 		</div>
-
-		<!-- ✅ Menerapkan logika render cerdas yang sama seperti di AnimeCard -->
-		{#if isHovering && trailerId && !videoHasError}
-			{@const playerVars = {
-				autoplay: 1,
-				controls: 0,
-				loop: 1,
-				playlist: trailerId,
-				mute: 1,
-				modestbranding: 1,
-				fs: 0,
-				iv_load_policy: 3,
-				rel: 0
-			}}
-			<div
-				class="absolute inset-0 h-full w-full transition-opacity duration-300"
-				class:opacity-100={isPlayerVisible}
-				class:opacity-0={!isPlayerVisible}
-			>
-				<YouTubePlayer
-					videoId={trailerId}
-					{playerVars}
-					onError={handleVideoError}
-					onReadyToPlay={handlePlayerReady}
-				/>
-			</div>
-		{/if}
 	</div>
 
-	<!-- KONTEN FOREGROUND (Tidak berubah) -->
 	<div class="relative z-20">
 		{#if subtitle}<p class="text-sm font-semibold tracking-wider text-slate-300 uppercase">
 				{subtitle}
