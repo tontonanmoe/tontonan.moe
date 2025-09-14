@@ -102,3 +102,67 @@ export function loadCachedClientConfig(): OnesieHotConfig | null {
 		return null;
 	}
 }
+
+export function asMap<K, V>(object: Record<string, V>): Map<K, V> {
+	const map = new Map<K, V>();
+	for (const key of Object.keys(object)) {
+		map.set(key as K, object[key]);
+	}
+	return map;
+}
+
+export function headersToGenericObject(headers: Headers): Record<string, string> {
+	const headersObj: Record<string, string> = {};
+	headers.forEach((value, key) => {
+		headersObj[key.trim()] = value;
+	});
+	return headersObj;
+}
+
+export interface EncryptedRequest {
+	encrypted: Uint8Array;
+	hmac: Uint8Array;
+	iv: Uint8Array;
+}
+
+export async function encryptRequest(
+	clientKey: Uint8Array,
+	data: Uint8Array
+): Promise<EncryptedRequest> {
+	if (clientKey.length !== 32) throw new Error('Invalid client key length');
+
+	const aesKeyData = clientKey.slice(0, 16);
+	const hmacKeyData = clientKey.slice(16, 32);
+
+	const iv = window.crypto.getRandomValues(new Uint8Array(16));
+
+	const aesKey = await window.crypto.subtle.importKey(
+		'raw',
+		aesKeyData,
+		{ name: 'AES-CTR', length: 128 },
+		false,
+		['encrypt']
+	);
+
+	const encrypted = new Uint8Array(
+		await window.crypto.subtle.encrypt(
+			{ name: 'AES-CTR', counter: iv, length: 128 },
+			aesKey,
+			data.slice()
+		)
+	);
+
+	const hmacKey = await window.crypto.subtle.importKey(
+		'raw',
+		hmacKeyData,
+		{ name: 'HMAC', hash: { name: 'SHA-256' } },
+		false,
+		['sign']
+	);
+
+	const hmac = new Uint8Array(
+		await window.crypto.subtle.sign('HMAC', hmacKey, new Uint8Array([...encrypted, ...iv]))
+	);
+
+	return { encrypted, hmac, iv };
+}

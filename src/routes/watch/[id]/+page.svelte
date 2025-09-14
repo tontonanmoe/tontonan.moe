@@ -1,4 +1,4 @@
-<script>
+<script lang="ts">
 	import YouTubePlayer from '$lib/components/YouTubePlayer.svelte';
 
 	let videoId = '';
