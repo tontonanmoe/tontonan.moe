@@ -48,11 +48,7 @@ export async function OPTIONS({ request }): Promise<Response> {
 	});
 }
 
-async function handleRequest(
-	request: Request,
-	requestUrl: URL,
-	params: Record<string, string>
-): Promise<Response> {
+async function handleRequest(request: Request, requestUrl: URL, params: any): Promise<Response> {
 	const origin = request.headers.get('origin') || '';
 
 	if (!requestUrl.searchParams.has('__host')) {
@@ -88,7 +84,7 @@ async function handleRequest(
 		requestHeaders.set('Authorization', request.headers.get('Authorization')!);
 	}
 
-	const fetchOptions: RequestInit & { duplex?: 'half' } = {
+	const fetchOptions: any = {
 		method: request.method,
 		headers: requestHeaders,
 		redirect: 'manual'
